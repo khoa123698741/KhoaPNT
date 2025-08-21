@@ -1,51 +1,42 @@
-"use client"
-
-import { YouTubeEmbed } from "@next/third-parties/google"
-import { extractPlainText, type NotionBlock } from "@/lib/notion-block-mapper"
-import { AlertCircle } from "lucide-react"
-
-interface YouTubeEmbedBlockProps {
-  block: NotionBlock
+interface YouTubeEmbedProps {
+  block: any
 }
 
-// Function to extract YouTube video ID from various URL formats
-function getYouTubeVideoId(url: string): string | null {
-  const regExp = /^.*(?:youtu.be\/|v\/|e\/|u\/\w+\/|embed\/|v=)([^#&?]*).*/
-  const match = url.match(regExp)
-  return match && match[1].length === 11 ? match[1] : null
-}
+export function YouTubeEmbedBlock({ block }: YouTubeEmbedProps) {
+  const { video } = block
+  const url = video?.external?.url
 
-export function YouTubeEmbedBlock({ block }: YouTubeEmbedBlockProps) {
-  const videoUrl = block.video?.external?.url || ""
-  const caption = extractPlainText(block.video?.caption || [])
-  const videoId = getYouTubeVideoId(videoUrl)
+  if (!url) return null
+
+  // Extract YouTube video ID
+  const getYouTubeId = (url: string) => {
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/
+    const match = url.match(regExp)
+    return match && match[2].length === 11 ? match[2] : null
+  }
+
+  const videoId = getYouTubeId(url)
 
   if (!videoId) {
     return (
-      <div className="border border-border rounded-lg p-8 text-center bg-muted/20">
-        <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
-        <h3 className="text-lg font-medium text-foreground mb-2">Không thể tải video YouTube</h3>
-        <p className="text-muted-foreground mb-4">
-          URL video không hợp lệ hoặc không phải là video YouTube. Vui lòng kiểm tra lại URL trong Notion.
-        </p>
-        {caption && <p className="text-sm text-muted-foreground mt-4">{caption}</p>}
+      <div className="mb-4">
+        <a href={url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+          {url}
+        </a>
       </div>
     )
   }
 
   return (
-    <div className="space-y-2">
-      <div className="relative w-full overflow-hidden rounded-lg border border-border bg-black">
-        <YouTubeEmbed
-          videoid={videoId}
-          height={400} // Chiều cao mặc định
-          width="100%" // Chiều rộng full
-          params="controls=1&modestbranding=1&rel=0" // Tùy chỉnh params
-          style={{ borderRadius: "0.5rem" }}
-          playlabel={caption || "Play video"}
+    <div className="mb-4">
+      <div className="relative w-full h-0 pb-[56.25%]">
+        <iframe
+          src={`https://www.youtube.com/embed/${videoId}`}
+          title="YouTube video"
+          className="absolute top-0 left-0 w-full h-full rounded-lg"
+          allowFullScreen
         />
       </div>
-      {caption && <p className="text-sm text-muted-foreground text-center">{caption}</p>}
     </div>
   )
 }

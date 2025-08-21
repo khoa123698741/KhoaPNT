@@ -2,32 +2,34 @@ import { NextResponse } from "next/server"
 import type { NextRequest } from "next/server"
 
 export function middleware(request: NextRequest) {
-  // Get the pathname of the request (e.g. /, /admin, /login)
-  const path = request.nextUrl.pathname
+  const { pathname } = request.nextUrl
 
-  // Define public paths that don't require authentication
-  const publicPaths = ["/login"]
-
-  // Check if the path is public
-  const isPublicPath = publicPaths.includes(path)
-
-  // Get the token from the cookies
-  const token = request.cookies.get("auth-token")?.value
-
-  // If it's a public path and user is already logged in, redirect to home
-  if (isPublicPath && token) {
-    return NextResponse.redirect(new URL("/", request.nextUrl))
+  // Skip middleware for static files and API routes
+  if (
+    pathname.startsWith("/_next") ||
+    pathname.startsWith("/api") ||
+    pathname.includes(".") ||
+    pathname === "/favicon.ico"
+  ) {
+    return NextResponse.next()
   }
 
-  // If it's not a public path and no token, redirect to login
-  if (!isPublicPath && !token) {
-    return NextResponse.redirect(new URL("/login", request.nextUrl))
+  // Allow access to login page
+  if (pathname === "/login") {
+    return NextResponse.next()
+  }
+
+  // Check for auth cookie
+  const authCookie = request.cookies.get("auth")
+
+  if (!authCookie || authCookie.value !== "authenticated") {
+    // Redirect to login if not authenticated
+    return NextResponse.redirect(new URL("/login", request.url))
   }
 
   return NextResponse.next()
 }
 
-// See "Matching Paths" below to learn more
 export const config = {
   matcher: [
     /*

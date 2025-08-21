@@ -1,9 +1,8 @@
 "use client"
 
 import { useState } from "react"
-import { ChevronRight } from "lucide-react"
+import { ChevronRight, ChevronDown } from "lucide-react"
 import { renderRichText, renderNotionBlock, getNotionColorClass } from "@/lib/notion-block-mapper"
-import { cn } from "@/lib/utils"
 
 interface ToggleBlockProps {
   block: any
@@ -11,29 +10,28 @@ interface ToggleBlockProps {
 
 export function ToggleBlock({ block }: ToggleBlockProps) {
   const [isOpen, setIsOpen] = useState(false)
-  const toggle = block.toggle || {}
-  const text = toggle.rich_text || []
-  const children = block.children || []
-  const color = toggle.color || "default"
-  const colorClass = getNotionColorClass(color)
+  const { toggle } = block
+  const colorClass = getNotionColorClass(toggle?.color)
 
   return (
-    <div className="toggle-block">
+    <div className="mb-2">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className={cn("flex items-center gap-2 w-full text-left hover:bg-muted/50 rounded p-1 -ml-1", colorClass)}
+        className={`flex items-center gap-2 w-full text-left hover:bg-gray-100 dark:hover:bg-gray-800 p-2 rounded ${colorClass}`}
       >
-        <ChevronRight className={cn("h-4 w-4 transition-transform flex-shrink-0", isOpen && "rotate-90")} />
-        <div className="flex-1">{renderRichText(text)}</div>
+        {isOpen ? (
+          <ChevronDown className="w-4 h-4 flex-shrink-0" />
+        ) : (
+          <ChevronRight className="w-4 h-4 flex-shrink-0" />
+        )}
+        <span>{renderRichText(toggle?.rich_text || [])}</span>
       </button>
 
-      {isOpen && children.length > 0 && (
-        <div className="toggle-content">
-          <div className="notion-nested-content">
-            {children.map((child: any, index: number) => (
-              <div key={child.id || index}>{renderNotionBlock(child)}</div>
-            ))}
-          </div>
+      {isOpen && block.children && (
+        <div className="ml-6 mt-2">
+          {block.children.map((childBlock: any, index: number) => (
+            <div key={childBlock.id || index}>{renderNotionBlock(childBlock)}</div>
+          ))}
         </div>
       )}
     </div>

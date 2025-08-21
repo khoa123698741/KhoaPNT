@@ -1,32 +1,19 @@
 import { renderRichText, getNotionColorClass } from "@/lib/notion-block-mapper"
-import { cn } from "@/lib/utils"
 
-interface ListItemProps {
+interface ListProps {
   block: any
 }
 
-export function BulletedListBlock({ block }: ListItemProps) {
-  const text = block.bulleted_list_item?.rich_text || []
-  const color = block.bulleted_list_item?.color || "default"
-  const colorClass = getNotionColorClass(color)
+export function BulletedListBlock({ block }: ListProps) {
+  const { bulleted_list_item } = block
+  const colorClass = getNotionColorClass(bulleted_list_item?.color)
 
-  return (
-    <div className="flex items-start gap-2 bulleted-list-item">
-      <span className="text-muted-foreground mt-1.5 text-sm">•</span>
-      <div className={cn("flex-1", colorClass)}>{renderRichText(text)}</div>
-    </div>
-  )
+  return <li className={`mb-1 ${colorClass}`}>{renderRichText(bulleted_list_item?.rich_text || [])}</li>
 }
 
-export function NumberedListBlock({ block }: ListItemProps) {
-  const text = block.numbered_list_item?.rich_text || []
-  const color = block.numbered_list_item?.color || "default"
-  const colorClass = getNotionColorClass(color)
+export function NumberedListBlock({ block }: ListProps) {
+  const { numbered_list_item } = block
+  const colorClass = getNotionColorClass(numbered_list_item?.color)
 
-  return (
-    <div className="flex items-start gap-2 numbered-list-item">
-      <span className="text-muted-foreground mt-1.5 text-sm min-w-[1.5rem]">1.</span>
-      <div className={cn("flex-1", colorClass)}>{renderRichText(text)}</div>
-    </div>
-  )
+  return <li className={`mb-1 ${colorClass}`}>{renderRichText(numbered_list_item?.rich_text || [])}</li>
 }

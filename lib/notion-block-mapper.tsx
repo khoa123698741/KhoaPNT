@@ -12,19 +12,21 @@ import { PDFViewer } from "@/components/blocks/pdf-viewer"
 import { FileViewer } from "@/components/blocks/file-viewer"
 import { YouTubeEmbedBlock } from "@/components/blocks/youtube-embed-block"
 import { GalleryBlock } from "@/components/blocks/gallery-block"
-import { ToggleBlock } from "@/components/blocks/toggle-block" // NEW: Import ToggleBlock
+import { ToggleBlock } from "@/components/blocks/toggle-block"
 
 export interface NotionBlock {
   id: string
   type: string
   [key: string]: any
-  children?: NotionBlock[] // NEW: Add children property for recursive blocks
+  children?: NotionBlock[]
 }
 
 /**
  * Maps Notion API block types to React components
  */
 export function renderNotionBlock(block: NotionBlock): React.ReactNode {
+  console.log("Rendering block:", block.type, block.id) // Debug log
+
   switch (block.type) {
     case "heading_1":
       return <HeadingOne key={block.id} block={block} />
@@ -74,12 +76,16 @@ export function renderNotionBlock(block: NotionBlock): React.ReactNode {
     case "child_database":
       return <GalleryBlock key={block.id} block={block} />
 
-    case "toggle": // NEW: Handle toggle blocks
+    case "toggle":
       return <ToggleBlock key={block.id} block={block} />
 
     default:
-      console.warn(`Unsupported block type: ${block.type}`)
-      return null
+      console.warn(`Unsupported block type: ${block.type}`, block)
+      return (
+        <div key={block.id} className="p-2 bg-yellow-100 dark:bg-yellow-900/30 rounded text-sm">
+          Unsupported block type: {block.type}
+        </div>
+      )
   }
 }
 

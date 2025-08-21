@@ -13,13 +13,19 @@ async function getBlocksWithChildren(blockId: string, depth = 0): Promise<any[]>
   }
 
   try {
+    console.log(`Fetching blocks for ${blockId} at depth ${depth}`) // Debug log
+
     const response = await notion.blocks.children.list({
       block_id: blockId,
       page_size: 100,
     })
 
+    console.log(`Found ${response.results.length} blocks for ${blockId}`) // Debug log
+
     const blocksWithChildren = await Promise.all(
       response.results.map(async (block: any) => {
+        console.log(`Processing block: ${block.type} - ${block.id}`) // Debug log
+
         if (block.has_children) {
           try {
             // Recursively fetch children for blocks that have them
@@ -42,8 +48,17 @@ async function getBlocksWithChildren(blockId: string, depth = 0): Promise<any[]>
 
 export async function getNotionPage(pageId: string) {
   try {
+    console.log(`Fetching Notion page: ${pageId}`) // Debug log
+
     // Use the improved recursive function to get all blocks including children
     const blocks = await getBlocksWithChildren(pageId)
+
+    console.log(`Total blocks fetched: ${blocks.length}`) // Debug log
+    console.log(
+      "Block types:",
+      blocks.map((b) => b.type),
+    ) // Debug log
+
     return blocks
   } catch (error) {
     console.error("Error fetching Notion page:", error)
@@ -53,10 +68,13 @@ export async function getNotionPage(pageId: string) {
 
 export async function getNotionPageInfo(pageId: string) {
   try {
+    console.log(`Fetching page info for: ${pageId}`) // Debug log
+
     const response = await notion.pages.retrieve({
       page_id: pageId,
     })
 
+    console.log("Page info fetched successfully") // Debug log
     return response
   } catch (error) {
     console.error("Error fetching page info:", error)

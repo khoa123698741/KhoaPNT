@@ -1,16 +1,9 @@
-import { renderRichText, getNotionColorClass } from "@/lib/notion-block-mapper"
+import { renderRichText, type NotionBlock } from "@/lib/notion-block-mapper"
 
-interface ParagraphProps {
-  block: any
-}
+export function ParagraphBlock({ block }: { block: NotionBlock }) {
+  const text = block.paragraph?.rich_text || []
 
-export function ParagraphBlock({ block }: ParagraphProps) {
-  const { paragraph } = block
-  const colorClass = getNotionColorClass(paragraph?.color)
+  if (!text.length) return null
 
-  if (!paragraph?.rich_text || paragraph.rich_text.length === 0) {
-    return <div className="mb-2"></div>
-  }
-
-  return <p className={`mb-2 leading-relaxed ${colorClass}`}>{renderRichText(paragraph.rich_text)}</p>
+  return <p className="text-base leading-relaxed text-foreground">{renderRichText(text)}</p>
 }

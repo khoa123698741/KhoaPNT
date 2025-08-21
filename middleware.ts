@@ -44,8 +44,8 @@ export const config = {
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
      * - login (login page)
-     * - notion (notion pages) // ADD this line
+     * Now ALL paths including /notion require authentication
      */
-    "/((?!api|_next/static|_next/image|favicon.ico|login|notion).*)",
+    "/((?!api|_next/static|_next/image|favicon.ico|login).*)",
   ],
 }

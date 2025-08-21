@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { ChevronRight, ChevronDown } from "lucide-react"
-import { renderRichText, renderNotionBlock, type NotionBlock } from "@/lib/notion-block-mapper"
+import { renderRichText, renderNotionBlock, getNotionColorClasses, type NotionBlock } from "@/lib/notion-block-mapper"
 
 interface ToggleBlockProps {
   block: NotionBlock
@@ -11,13 +11,15 @@ interface ToggleBlockProps {
 export function ToggleBlock({ block }: ToggleBlockProps) {
   const [isOpen, setIsOpen] = useState(false)
   const text = block.toggle?.rich_text || []
+  const color = block.toggle?.color
+  const colorClass = getNotionColorClasses(color)
   const childrenBlocks = block.children || []
 
   return (
-    <div className="space-y-1">
+    <div className="space-y-1 mb-2">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-start w-full text-left py-1 px-1 rounded-sm hover:bg-muted/30 transition-colors group min-h-[28px]"
+        className={`flex items-start w-full text-left py-1 px-1 rounded-sm hover:bg-muted/30 transition-colors group min-h-[28px] ${colorClass}`}
         aria-expanded={isOpen}
         aria-controls={`toggle-content-${block.id}`}
       >

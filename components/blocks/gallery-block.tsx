@@ -20,7 +20,7 @@ export async function GalleryBlock({ block }: GalleryBlockProps) {
 
   if (!databaseId) {
     return (
-      <div className="border border-border rounded-lg p-8 text-center bg-muted/20">
+      <div className="border border-border rounded-lg p-8 text-center bg-muted/20 mb-4">
         <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
         <h3 className="text-lg font-medium text-foreground mb-2">Không thể tải Gallery</h3>
         <p className="text-muted-foreground mb-4">
@@ -34,7 +34,7 @@ export async function GalleryBlock({ block }: GalleryBlockProps) {
 
   if (!items || items.length === 0) {
     return (
-      <div className="border border-border rounded-lg p-8 text-center bg-muted/20">
+      <div className="border border-border rounded-lg p-8 text-center bg-muted/20 mb-4">
         <AlertCircle className="h-12 w-12 text-yellow-500 mx-auto mb-4" />
         <h3 className="text-lg font-medium text-foreground mb-2">Không có mục nào trong Gallery</h3>
         <p className="text-muted-foreground mb-4">Database này không có mục nào hoặc không thể truy cập được.</p>
@@ -43,7 +43,7 @@ export async function GalleryBlock({ block }: GalleryBlockProps) {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 mb-6">
       <h3 className="text-2xl font-medium text-foreground mt-10 mb-4">{block.child_database?.title || "Gallery"}</h3>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {items.map((item) => (

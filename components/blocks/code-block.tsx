@@ -21,7 +21,7 @@ export function CodeBlock({ block }: { block: NotionBlock }) {
   }
 
   return (
-    <div className="relative bg-gray-900 dark:bg-gray-950 rounded-lg overflow-hidden">
+    <div className="relative bg-gray-900 dark:bg-gray-950 rounded-lg overflow-hidden mb-4">
       <div className="flex items-center justify-between px-4 py-2 bg-gray-800 dark:bg-gray-900 border-b border-gray-700">
         <span className="text-sm text-gray-300 capitalize">{language}</span>
         <Button

@@ -1,104 +1,73 @@
 "use client"
 
 import { useState } from "react"
-import { FileText, Maximize2, Minimize2, ExternalLink, AlertCircle } from "lucide-react"
+import { ExternalLink, Download } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { extractPlainText, type NotionBlock } from "@/lib/notion-block-mapper"
 
 interface PDFViewerProps {
-  block: NotionBlock
+  url: string
+  caption?: string
 }
 
-export function PDFViewer({ block }: PDFViewerProps) {
-  const [isPDFFullWidth, setIsPDFFullWidth] = useState(false)
+export function PDFViewer({ url, caption }: PDFViewerProps) {
   const [isLoading, setIsLoading] = useState(true)
-  const [hasError, setHasError] = useState(false)
-
-  const pdfUrl = block.pdf?.file?.url || block.pdf?.external?.url || ""
-  const caption = extractPlainText(block.pdf?.caption || [])
-  const fileName = caption || "Document.pdf"
-
-  if (!pdfUrl) {
-    return (
-      <div className="border border-border rounded-lg p-8 text-center">
-        <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-        <p className="text-muted-foreground">Không thể tải PDF</p>
-      </div>
-    )
-  }
 
   const handleOpenInNewTab = () => {
-    // Mở PDF trong tab mới
-    window.open(pdfUrl, "_blank")
+    window.open(url, "_blank", "noopener,noreferrer")
   }
 
-  const handleIframeError = () => {
-    setIsLoading(false)
-    setHasError(true)
-  }
-
-  if (hasError) {
-    return (
-      <div className="border border-border rounded-lg p-8 text-center bg-muted/20">
-        <AlertCircle className="h-12 w-12 text-yellow-500 mx-auto mb-4" />
-        <h3 className="text-lg font-medium text-foreground mb-2">PDF không thể tải</h3>
-        <p className="text-muted-foreground mb-4">
-          Liên kết PDF từ Notion có thể đã hết hạn. Notion tạo ra các liên kết tạm thời chỉ có hiệu lực trong 1 giờ.
-        </p>
-        <Button onClick={() => window.location.reload()} variant="outline" className="mb-2">
-          Refresh trang để tải lại
-        </Button>
-        {caption && <p className="text-sm text-muted-foreground mt-4">{caption}</p>}
-      </div>
-    )
+  const handleDownload = () => {
+    const link = document.createElement("a")
+    link.href = url
+    link.download = caption || "document.pdf"
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
   }
 
   return (
-    <div className={`transition-all duration-300 ${isPDFFullWidth ? "pdf-full-width" : ""}`}>
-      {/* PDF Controls - chỉ hiển thị khi hover */}
-      <div className="group relative">
-        <div className="absolute top-2 right-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center gap-1 bg-background/90 backdrop-blur-sm rounded-lg p-1 shadow-lg">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setIsPDFFullWidth(!isPDFFullWidth)}
-            className="h-8 px-2"
-            title={isPDFFullWidth ? "Thu nhỏ PDF" : "Mở rộng PDF"}
-          >
-            {isPDFFullWidth ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
-          </Button>
-
-          <Button variant="ghost" size="sm" onClick={handleOpenInNewTab} className="h-8 px-2" title="Mở trong tab mới">
-            <ExternalLink className="h-4 w-4" />
-          </Button>
+    <div className="w-full my-4">
+      <div className="relative bg-gray-100 dark:bg-gray-800 rounded-lg overflow-hidden">
+        <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 border-b">
+          <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{caption || "PDF Document"}</span>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleOpenInNewTab}
+              className="flex items-center gap-1 bg-transparent"
+            >
+              <ExternalLink className="h-4 w-4" />
+              Mở trong tab mới
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleDownload}
+              className="flex items-center gap-1 bg-transparent"
+            >
+              <Download className="h-4 w-4" />
+              Tải xuống
+            </Button>
+          </div>
         </div>
 
-        {/* PDF Embed - ẩn toolbar */}
-        <div className="relative rounded-lg overflow-hidden bg-white border border-border">
+        <div className="relative" style={{ height: "600px" }}>
           {isLoading && (
-            <div className="absolute inset-0 flex items-center justify-center bg-muted/50 z-10">
-              <div className="flex items-center gap-2">
-                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
-                <span className="text-sm text-muted-foreground">Đang tải PDF...</span>
-              </div>
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 dark:border-gray-100"></div>
             </div>
           )}
-
           <iframe
-            src={`${pdfUrl}#toolbar=0&navpanes=0&scrollbar=0&statusbar=0&messages=0&scrollbar=0`}
-            className={`w-full border-0 ${isPDFFullWidth ? "h-[85vh]" : "h-[600px]"}`}
-            title={fileName}
+            src={`${url}#toolbar=1&navpanes=1&scrollbar=1`}
+            className="w-full h-full border-0"
             onLoad={() => setIsLoading(false)}
-            onError={handleIframeError}
-            style={{
-              border: "none",
-              outline: "none",
-            }}
+            title={caption || "PDF Document"}
           />
         </div>
       </div>
 
-      {caption && <p className="text-sm text-muted-foreground text-center mt-2 px-4">{caption}</p>}
+      {caption && <p className="text-sm text-gray-600 dark:text-gray-400 mt-2 text-center italic">{caption}</p>}
     </div>
   )
 }

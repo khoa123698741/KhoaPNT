@@ -58,7 +58,7 @@ const ContextMenuContent = React.forwardRef<
   React.ElementRef<typeof ContextMenuPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof ContextMenuPrimitive.Content>
 >(({ className, ...props }, ref) => (
-  <ContextMenuPrimitive.Portal>
+  <ContextMenuPortal>
     <ContextMenuPrimitive.Content
       ref={ref}
       className={cn(
@@ -67,7 +67,7 @@ const ContextMenuContent = React.forwardRef<
       )}
       {...props}
     />
-  </ContextMenuPrimitive.Portal>
+  </ContextMenuPortal>
 ))
 ContextMenuContent.displayName = ContextMenuPrimitive.Content.displayName
 
@@ -171,10 +171,10 @@ export {
   ContextMenuLabel,
   ContextMenuSeparator,
   ContextMenuShortcut,
-  ContextMenuGroup,
-  ContextMenuPortal,
   ContextMenuSub,
   ContextMenuSubContent,
   ContextMenuSubTrigger,
+  ContextMenuGroup,
+  ContextMenuPortal,
   ContextMenuRadioGroup,
 }

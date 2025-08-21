@@ -1,51 +1,32 @@
-import { renderRichText, renderNotionBlock, type NotionBlock } from "@/lib/notion-block-mapper"
+import { renderRichText, getNotionColorClass } from "@/lib/notion-block-mapper"
+import { cn } from "@/lib/utils"
 
-export function BulletedListBlock({ block }: { block: NotionBlock }) {
+interface ListItemProps {
+  block: any
+}
+
+export function BulletedListBlock({ block }: ListItemProps) {
   const text = block.bulleted_list_item?.rich_text || []
-  const childrenBlocks = block.children || []
+  const color = block.bulleted_list_item?.color || "default"
+  const colorClass = getNotionColorClass(color)
 
   return (
-    <div className="space-y-1">
-      <div className="flex items-start">
-        <span className="w-1.5 h-1.5 bg-foreground rounded-full mt-2.5 mr-3 flex-shrink-0"></span>
-        <div className="flex-1">
-          <span className="leading-relaxed">{renderRichText(text)}</span>
-        </div>
-      </div>
-
-      {childrenBlocks.length > 0 && (
-        <div className="ml-6 space-y-2">
-          {childrenBlocks.map((childBlock: NotionBlock) => (
-            <div key={childBlock.id}>{renderNotionBlock(childBlock)}</div>
-          ))}
-        </div>
-      )}
+    <div className="flex items-start gap-2 bulleted-list-item">
+      <span className="text-muted-foreground mt-1.5 text-sm">•</span>
+      <div className={cn("flex-1", colorClass)}>{renderRichText(text)}</div>
     </div>
   )
 }
 
-export function NumberedListBlock({ block, index = 1 }: { block: NotionBlock; index?: number }) {
+export function NumberedListBlock({ block }: ListItemProps) {
   const text = block.numbered_list_item?.rich_text || []
-  const childrenBlocks = block.children || []
+  const color = block.numbered_list_item?.color || "default"
+  const colorClass = getNotionColorClass(color)
 
   return (
-    <div className="space-y-1">
-      <div className="flex items-start">
-        <span className="bg-primary text-primary-foreground rounded-full w-5 h-5 flex items-center justify-center text-xs font-medium mr-3 mt-1 flex-shrink-0">
-          {index}
-        </span>
-        <div className="flex-1">
-          <span className="leading-relaxed">{renderRichText(text)}</span>
-        </div>
-      </div>
-
-      {childrenBlocks.length > 0 && (
-        <div className="ml-8 space-y-2">
-          {childrenBlocks.map((childBlock: NotionBlock) => (
-            <div key={childBlock.id}>{renderNotionBlock(childBlock)}</div>
-          ))}
-        </div>
-      )}
+    <div className="flex items-start gap-2 numbered-list-item">
+      <span className="text-muted-foreground mt-1.5 text-sm min-w-[1.5rem]">1.</span>
+      <div className={cn("flex-1", colorClass)}>{renderRichText(text)}</div>
     </div>
   )
 }

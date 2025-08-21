@@ -1,19 +1,30 @@
-import { renderRichText, type NotionBlock } from "@/lib/notion-block-mapper"
+import { renderRichText, getNotionColorClass } from "@/lib/notion-block-mapper"
+import { cn } from "@/lib/utils"
 
-export function HeadingOne({ block }: { block: NotionBlock }) {
+interface HeadingProps {
+  block: any
+}
+
+export function HeadingOne({ block }: HeadingProps) {
   const text = block.heading_1?.rich_text || []
+  const color = block.heading_1?.color || "default"
+  const colorClass = getNotionColorClass(color)
 
-  return <h1 className="text-4xl font-bold text-foreground mb-6">{renderRichText(text)}</h1>
+  return <h1 className={cn("text-3xl font-bold mb-4", colorClass)}>{renderRichText(text)}</h1>
 }
 
-export function HeadingTwo({ block }: { block: NotionBlock }) {
+export function HeadingTwo({ block }: HeadingProps) {
   const text = block.heading_2?.rich_text || []
+  const color = block.heading_2?.color || "default"
+  const colorClass = getNotionColorClass(color)
 
-  return <h2 className="text-3xl font-semibold text-foreground mt-12 mb-6">{renderRichText(text)}</h2>
+  return <h2 className={cn("text-2xl font-semibold mb-3", colorClass)}>{renderRichText(text)}</h2>
 }
 
-export function HeadingThree({ block }: { block: NotionBlock }) {
+export function HeadingThree({ block }: HeadingProps) {
   const text = block.heading_3?.rich_text || []
+  const color = block.heading_3?.color || "default"
+  const colorClass = getNotionColorClass(color)
 
-  return <h3 className="text-2xl font-medium text-foreground mt-10 mb-4">{renderRichText(text)}</h3>
+  return <h3 className={cn("text-xl font-medium mb-2", colorClass)}>{renderRichText(text)}</h3>
 }

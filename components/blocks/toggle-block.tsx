@@ -1,39 +1,39 @@
 "use client"
 
 import { useState } from "react"
-import { ChevronRight, ChevronDown } from "lucide-react"
-import { renderRichText, renderNotionBlock, type NotionBlock } from "@/lib/notion-block-mapper"
+import { ChevronRight } from "lucide-react"
+import { renderRichText, renderNotionBlock, getNotionColorClass } from "@/lib/notion-block-mapper"
+import { cn } from "@/lib/utils"
 
 interface ToggleBlockProps {
-  block: NotionBlock
+  block: any
 }
 
 export function ToggleBlock({ block }: ToggleBlockProps) {
   const [isOpen, setIsOpen] = useState(false)
-  const text = block.toggle?.rich_text || []
-  const childrenBlocks = block.children || []
+  const toggle = block.toggle || {}
+  const text = toggle.rich_text || []
+  const children = block.children || []
+  const color = toggle.color || "default"
+  const colorClass = getNotionColorClass(color)
 
   return (
-    <div className="space-y-1">
+    <div className="toggle-block">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-start w-full text-left py-1 px-1 rounded-sm hover:bg-muted/30 transition-colors group min-h-[28px]"
-        aria-expanded={isOpen}
-        aria-controls={`toggle-content-${block.id}`}
+        className={cn("flex items-center gap-2 w-full text-left hover:bg-muted/50 rounded p-1 -ml-1", colorClass)}
       >
-        <span className="flex-shrink-0 mr-1 text-muted-foreground group-hover:text-foreground transition-colors mt-0.5">
-          {isOpen ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
-        </span>
-        <span className="text-foreground leading-relaxed flex-1">{renderRichText(text)}</span>
+        <ChevronRight className={cn("h-4 w-4 transition-transform flex-shrink-0", isOpen && "rotate-90")} />
+        <div className="flex-1">{renderRichText(text)}</div>
       </button>
 
-      {isOpen && childrenBlocks.length > 0 && (
-        <div id={`toggle-content-${block.id}`} className="ml-5 space-y-2 border-l border-border/30 pl-4 py-1">
-          {childrenBlocks.map((childBlock: NotionBlock) => (
-            <div key={childBlock.id} className="notion-nested-content">
-              {renderNotionBlock(childBlock)}
-            </div>
-          ))}
+      {isOpen && children.length > 0 && (
+        <div className="toggle-content">
+          <div className="notion-nested-content">
+            {children.map((child: any, index: number) => (
+              <div key={child.id || index}>{renderNotionBlock(child)}</div>
+            ))}
+          </div>
         </div>
       )}
     </div>

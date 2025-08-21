@@ -2,39 +2,32 @@ import { NextResponse } from "next/server"
 import type { NextRequest } from "next/server"
 
 export function middleware(request: NextRequest) {
-  // Allow access to login page
-  if (request.nextUrl.pathname === "/login") {
-    return NextResponse.next()
+  // Get the pathname of the request (e.g. /, /admin, /login)
+  const path = request.nextUrl.pathname
+
+  // Define public paths that don't require authentication
+  const publicPaths = ["/login"]
+
+  // Check if the path is public
+  const isPublicPath = publicPaths.includes(path)
+
+  // Get the token from the cookies
+  const token = request.cookies.get("auth-token")?.value
+
+  // If it's a public path and user is already logged in, redirect to home
+  if (isPublicPath && token) {
+    return NextResponse.redirect(new URL("/", request.nextUrl))
   }
 
-  // Check authentication cookie
-  const authCookie = request.cookies.get("auth")
-
-  if (!authCookie) {
-    return NextResponse.redirect(new URL("/login", request.url))
+  // If it's not a public path and no token, redirect to login
+  if (!isPublicPath && !token) {
+    return NextResponse.redirect(new URL("/login", request.nextUrl))
   }
 
-  try {
-    const authData = JSON.parse(authCookie.value)
-
-    if (!authData.authenticated) {
-      return NextResponse.redirect(new URL("/login", request.url))
-    }
-
-    // Admin page access control
-    if (request.nextUrl.pathname === "/admin") {
-      if (!authData.isAdmin) {
-        return NextResponse.redirect(new URL("/", request.url))
-      }
-    }
-
-    return NextResponse.next()
-  } catch (error) {
-    // Invalid cookie format
-    return NextResponse.redirect(new URL("/login", request.url))
-  }
+  return NextResponse.next()
 }
 
+// See "Matching Paths" below to learn more
 export const config = {
   matcher: [
     /*
@@ -43,9 +36,7 @@ export const config = {
      * - _next/static (static files)
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
-     * - login (login page)
-     * Now ALL paths including /notion require authentication
      */
-    "/((?!api|_next/static|_next/image|favicon.ico|login).*)",
+    "/((?!api|_next/static|_next/image|favicon.ico).*)",
   ],
 }

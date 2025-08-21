@@ -1,10 +1,17 @@
-import { renderRichText, type NotionBlock } from "@/lib/notion-block-mapper"
+import { renderRichText, getNotionColorClass } from "@/lib/notion-block-mapper"
+import { cn } from "@/lib/utils"
 
-export function QuoteBlock({ block }: { block: NotionBlock }) {
+interface QuoteProps {
+  block: any
+}
+
+export function QuoteBlock({ block }: QuoteProps) {
   const text = block.quote?.rich_text || []
+  const color = block.quote?.color || "default"
+  const colorClass = getNotionColorClass(color)
 
   return (
-    <blockquote className="border-l-4 border-primary pl-6 py-2 italic text-muted-foreground bg-muted/30 rounded-r-lg">
+    <blockquote className={cn("border-l-4 border-muted-foreground/30 pl-4 italic", colorClass)}>
       {renderRichText(text)}
     </blockquote>
   )

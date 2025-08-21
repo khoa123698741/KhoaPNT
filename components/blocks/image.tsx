@@ -8,7 +8,7 @@ export function ImageBlock({ block }: { block: NotionBlock }) {
   if (!imageUrl) return null
 
   return (
-    <div className="space-y-2 mb-4">
+    <div className="space-y-2">
       <Image
         src={imageUrl || "/placeholder.svg"}
         alt={caption || "Image"}

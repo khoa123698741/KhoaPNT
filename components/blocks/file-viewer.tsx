@@ -56,7 +56,7 @@ export function FileViewer({ block }: FileViewerProps) {
 
   if (!fileUrl) {
     return (
-      <div className="border border-border rounded-lg p-8 text-center mb-4">
+      <div className="border border-border rounded-lg p-8 text-center">
         <File className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
         <p className="text-muted-foreground">Không thể tải file</p>
       </div>
@@ -64,7 +64,7 @@ export function FileViewer({ block }: FileViewerProps) {
   }
 
   return (
-    <div className="border border-border rounded-lg bg-muted/20 hover:bg-muted/30 transition-colors mb-4">
+    <div className="border border-border rounded-lg bg-muted/20 hover:bg-muted/30 transition-colors">
       <div className="p-6">
         <div className="flex items-center gap-4">
           <div className="flex-shrink-0">{getFileIcon()}</div>

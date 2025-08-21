@@ -12,13 +12,13 @@ import { PDFViewer } from "@/components/blocks/pdf-viewer"
 import { FileViewer } from "@/components/blocks/file-viewer"
 import { YouTubeEmbedBlock } from "@/components/blocks/youtube-embed-block"
 import { GalleryBlock } from "@/components/blocks/gallery-block"
-import { ToggleBlock } from "@/components/blocks/toggle-block"
+import { ToggleBlock } from "@/components/blocks/toggle-block" // NEW: Import ToggleBlock
 
 export interface NotionBlock {
   id: string
   type: string
   [key: string]: any
-  children?: NotionBlock[]
+  children?: NotionBlock[] // NEW: Add children property for recursive blocks
 }
 
 /**
@@ -74,7 +74,7 @@ export function renderNotionBlock(block: NotionBlock): React.ReactNode {
     case "child_database":
       return <GalleryBlock key={block.id} block={block} />
 
-    case "toggle":
+    case "toggle": // NEW: Handle toggle blocks
       return <ToggleBlock key={block.id} block={block} />
 
     default:
@@ -125,7 +125,7 @@ export function getNotionColorClasses(color?: string): string {
 }
 
 /**
- * Renders rich text with formatting (bold, italic, etc.) and colors
+ * Renders rich text with formatting (bold, italic, etc.)
  */
 export function renderRichText(richText: any[]): React.ReactNode {
   if (!richText || !Array.isArray(richText)) return null

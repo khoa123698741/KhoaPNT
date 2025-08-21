@@ -2,27 +2,37 @@ import { NextResponse } from "next/server"
 import type { NextRequest } from "next/server"
 
 export function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl
-
-  // Skip middleware for static files and API routes
-  if (pathname.startsWith("/_next") || pathname.startsWith("/api") || pathname.includes(".")) {
+  // Allow access to login page
+  if (request.nextUrl.pathname === "/login") {
     return NextResponse.next()
   }
 
-  // Check for authentication cookie
+  // Check authentication cookie
   const authCookie = request.cookies.get("auth")
 
-  // If no auth cookie and not on login page, redirect to login
-  if (!authCookie && pathname !== "/login") {
+  if (!authCookie) {
     return NextResponse.redirect(new URL("/login", request.url))
   }
 
-  // If has auth cookie and on login page, redirect to home
-  if (authCookie && pathname === "/login") {
-    return NextResponse.redirect(new URL("/", request.url))
-  }
+  try {
+    const authData = JSON.parse(authCookie.value)
 
-  return NextResponse.next()
+    if (!authData.authenticated) {
+      return NextResponse.redirect(new URL("/login", request.url))
+    }
+
+    // Admin page access control
+    if (request.nextUrl.pathname === "/admin") {
+      if (!authData.isAdmin) {
+        return NextResponse.redirect(new URL("/", request.url))
+      }
+    }
+
+    return NextResponse.next()
+  } catch (error) {
+    // Invalid cookie format
+    return NextResponse.redirect(new URL("/login", request.url))
+  }
 }
 
 export const config = {
@@ -33,7 +43,9 @@ export const config = {
      * - _next/static (static files)
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
+     * - login (login page)
+     * - notion (notion pages) // ADD this line
      */
-    "/((?!api|_next/static|_next/image|favicon.ico).*)",
+    "/((?!api|_next/static|_next/image|favicon.ico|login|notion).*)",
   ],
 }

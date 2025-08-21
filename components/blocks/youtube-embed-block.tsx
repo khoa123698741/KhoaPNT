@@ -22,7 +22,7 @@ export function YouTubeEmbedBlock({ block }: YouTubeEmbedBlockProps) {
 
   if (!videoId) {
     return (
-      <div className="border border-border rounded-lg p-8 text-center bg-muted/20 mb-4">
+      <div className="border border-border rounded-lg p-8 text-center bg-muted/20">
         <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
         <h3 className="text-lg font-medium text-foreground mb-2">Không thể tải video YouTube</h3>
         <p className="text-muted-foreground mb-4">
@@ -34,13 +34,13 @@ export function YouTubeEmbedBlock({ block }: YouTubeEmbedBlockProps) {
   }
 
   return (
-    <div className="space-y-2 mb-4">
+    <div className="space-y-2">
       <div className="relative w-full overflow-hidden rounded-lg border border-border bg-black">
         <YouTubeEmbed
           videoid={videoId}
-          height={400}
-          width="100%"
-          params="controls=1&modestbranding=1&rel=0"
+          height={400} // Chiều cao mặc định
+          width="100%" // Chiều rộng full
+          params="controls=1&modestbranding=1&rel=0" // Tùy chỉnh params
           style={{ borderRadius: "0.5rem" }}
           playlabel={caption || "Play video"}
         />

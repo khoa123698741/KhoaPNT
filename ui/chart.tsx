@@ -47,7 +47,7 @@ const ChartContainer = React.forwardRef<
         data-chart={chartId}
         ref={ref}
         className={cn(
-          "flex aspect-video justify-center text-xs [&_.recharts-cartesian-axis-tick_text]:fill-muted-foreground [&_.recharts-cartesian-grid_line[stroke='#ccc']]:stroke-border [&_.recharts-curve.recharts-tooltip-cursor]:stroke-border [&_.recharts-dot[stroke='#fff']]:stroke-transparent [&_.recharts-layer]:outline-none [&_.recharts-polar-grid_[stroke='#ccc']]:stroke-border [&_.recharts-radial-bar-background-sector]:fill-muted [&_.recharts-rectangle.recharts-tooltip-cursor]:fill-muted [&_.recharts-reference-line_[stroke='#ccc']]:stroke-border [&_.recharts-sector[stroke='#fff']]:stroke-transparent [&_.recharts-sector]:outline-none [&_.recharts-surface]:outline-none",
+          "flex aspect-video justify-center text-xs [&_.recharts-cartesian-axis-tick_text]:fill-muted-foreground [&_.recharts-cartesian-grid_line[stroke='#ccc']]:stroke-border/50 [&_.recharts-curve.recharts-tooltip-cursor]:stroke-border [&_.recharts-dot[stroke='#fff']]:stroke-transparent [&_.recharts-layer]:outline-none [&_.recharts-polar-grid_[stroke='#ccc']]:stroke-border [&_.recharts-radial-bar-background-sector]:fill-muted [&_.recharts-rectangle.recharts-tooltip-cursor]:fill-muted [&_.recharts-reference-line_[stroke='#ccc']]:stroke-border [&_.recharts-sector[stroke='#fff']]:stroke-transparent [&_.recharts-sector]:outline-none [&_.recharts-surface]:outline-none",
           className,
         )}
         {...props}
@@ -273,7 +273,7 @@ const ChartLegendContent = React.forwardRef<
 })
 ChartLegendContent.displayName = "ChartLegendContent"
 
-// Helper to extract item config from a payload.
+// Helper to extract the key from a payload.
 function getPayloadConfigFromPayload(config: ChartConfig, payload: unknown, key: string) {
   if (typeof payload !== "object" || payload === null) {
     return undefined
@@ -284,13 +284,17 @@ function getPayloadConfigFromPayload(config: ChartConfig, payload: unknown, key:
       ? payload.payload
       : undefined
 
-  const configLabelKey: string = key
+  let configLabelKey: string = key
 
   if (key in config || (payloadPayload && configLabelKey in payloadPayload)) {
-    return config[configLabelKey]
+    configLabelKey = key
+  } else if ("dataKey" in payload && typeof payload.dataKey === "string") {
+    configLabelKey = payload.dataKey
+  } else if ("name" in payload && typeof payload.name === "string") {
+    configLabelKey = payload.name
   }
 
-  return config[configLabelKey]
+  return configLabelKey in config ? config[configLabelKey] : config[key]
 }
 
-export { ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent, ChartStyle }
+export { ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent }

@@ -1,46 +1,22 @@
-import { renderRichText, getNotionColorClasses } from "@/lib/notion-block-mapper"
-import { Info, AlertTriangle, CheckCircle, XCircle } from "lucide-react"
+import { Lightbulb, Info, AlertTriangle } from "lucide-react"
+import { renderRichText, type NotionBlock } from "@/lib/notion-block-mapper"
 
-interface CalloutProps {
-  block: any
-}
-
-export function CalloutBlock({ block }: CalloutProps) {
+export function CalloutBlock({ block }: { block: NotionBlock }) {
   const text = block.callout?.rich_text || []
-  const icon = block.callout?.icon
-  const color = block.callout?.color
-  const colorClass = getNotionColorClasses(color)
+  const emoji = block.callout?.icon?.emoji
 
-  if (!text.length) return null
-
-  // Get icon component based on emoji or default
-  const getIconComponent = () => {
-    if (icon?.emoji) {
-      return <span className="text-lg">{icon.emoji}</span>
-    }
-
-    // Default icons based on color
-    switch (color) {
-      case "red":
-      case "red_background":
-        return <XCircle className="w-5 h-5 text-red-500" />
-      case "yellow":
-      case "yellow_background":
-        return <AlertTriangle className="w-5 h-5 text-yellow-500" />
-      case "green":
-      case "green_background":
-        return <CheckCircle className="w-5 h-5 text-green-500" />
-      default:
-        return <Info className="w-5 h-5 text-blue-500" />
-    }
+  // Default to lightbulb if no emoji provided
+  const getIcon = () => {
+    if (emoji === "💡") return <Lightbulb className="h-5 w-5 text-yellow-600 dark:text-yellow-400" />
+    if (emoji === "ℹ️") return <Info className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+    if (emoji === "⚠️") return <AlertTriangle className="h-5 w-5 text-orange-600 dark:text-orange-400" />
+    return <Lightbulb className="h-5 w-5 text-yellow-600 dark:text-yellow-400" />
   }
 
   return (
-    <div
-      className={`flex gap-3 p-4 rounded-lg mb-4 border-l-4 border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 ${colorClass}`}
-    >
-      <div className="flex-shrink-0 mt-0.5">{getIconComponent()}</div>
-      <div className="flex-1">{renderRichText(text)}</div>
+    <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4 flex items-start gap-3">
+      <div className="mt-0.5 flex-shrink-0">{emoji ? <span className="text-lg">{emoji}</span> : getIcon()}</div>
+      <div className="text-sm text-yellow-700 dark:text-yellow-300">{renderRichText(text)}</div>
     </div>
   )
 }

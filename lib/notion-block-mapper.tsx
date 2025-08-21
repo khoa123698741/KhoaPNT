@@ -12,21 +12,19 @@ import { PDFViewer } from "@/components/blocks/pdf-viewer"
 import { FileViewer } from "@/components/blocks/file-viewer"
 import { YouTubeEmbedBlock } from "@/components/blocks/youtube-embed-block"
 import { GalleryBlock } from "@/components/blocks/gallery-block"
-import { ToggleBlock } from "@/components/blocks/toggle-block"
+import { ToggleBlock } from "@/components/blocks/toggle-block" // NEW: Import ToggleBlock
 
 export interface NotionBlock {
   id: string
   type: string
   [key: string]: any
-  children?: NotionBlock[]
+  children?: NotionBlock[] // NEW: Add children property for recursive blocks
 }
 
 /**
  * Maps Notion API block types to React components
  */
 export function renderNotionBlock(block: NotionBlock): React.ReactNode {
-  console.log("Rendering block:", block.type, block.id) // Debug log
-
   switch (block.type) {
     case "heading_1":
       return <HeadingOne key={block.id} block={block} />
@@ -76,16 +74,12 @@ export function renderNotionBlock(block: NotionBlock): React.ReactNode {
     case "child_database":
       return <GalleryBlock key={block.id} block={block} />
 
-    case "toggle":
+    case "toggle": // NEW: Handle toggle blocks
       return <ToggleBlock key={block.id} block={block} />
 
     default:
-      console.warn(`Unsupported block type: ${block.type}`, block)
-      return (
-        <div key={block.id} className="p-2 bg-yellow-100 dark:bg-yellow-900/30 rounded text-sm">
-          Unsupported block type: {block.type}
-        </div>
-      )
+      console.warn(`Unsupported block type: ${block.type}`)
+      return null
   }
 }
 
@@ -98,93 +92,28 @@ export function extractPlainText(richText: any[]): string {
 }
 
 /**
- * Gets Notion color classes for text and background colors
- */
-export function getNotionColorClasses(color?: string): string {
-  if (!color || color === "default") return ""
-
-  const colorMap: { [key: string]: string } = {
-    // Text colors
-    gray: "text-gray-600 dark:text-gray-400",
-    brown: "text-amber-700 dark:text-amber-300",
-    orange: "text-orange-600 dark:text-orange-400",
-    yellow: "text-yellow-600 dark:text-yellow-400",
-    green: "text-green-600 dark:text-green-400",
-    blue: "text-blue-600 dark:text-blue-400",
-    purple: "text-purple-600 dark:text-purple-400",
-    pink: "text-pink-600 dark:text-pink-400",
-    red: "text-red-600 dark:text-red-400",
-
-    // Background colors
-    gray_background: "bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 px-2 py-1 rounded-md",
-    brown_background: "bg-amber-100 dark:bg-amber-900/30 text-amber-900 dark:text-amber-100 px-2 py-1 rounded-md",
-    orange_background: "bg-orange-100 dark:bg-orange-900/30 text-orange-900 dark:text-orange-100 px-2 py-1 rounded-md",
-    yellow_background: "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-900 dark:text-yellow-100 px-2 py-1 rounded-md",
-    green_background: "bg-green-100 dark:bg-green-900/30 text-green-900 dark:text-green-100 px-2 py-1 rounded-md",
-    blue_background: "bg-blue-100 dark:bg-blue-900/30 text-blue-900 dark:text-blue-100 px-2 py-1 rounded-md",
-    purple_background: "bg-purple-100 dark:bg-purple-900/30 text-purple-900 dark:text-purple-100 px-2 py-1 rounded-md",
-    pink_background: "bg-pink-100 dark:bg-pink-900/30 text-pink-900 dark:text-pink-100 px-2 py-1 rounded-md",
-    red_background: "bg-red-100 dark:bg-red-900/30 text-red-900 dark:text-red-100 px-2 py-1 rounded-md",
-  }
-
-  return colorMap[color] || ""
-}
-
-/**
  * Renders rich text with formatting (bold, italic, etc.)
  */
 export function renderRichText(richText: any[]): React.ReactNode {
   if (!richText || !Array.isArray(richText)) return null
 
   return richText.map((text, index) => {
-    let element: React.ReactNode = text.plain_text || ""
-    const colorClass = getNotionColorClasses(text.annotations?.color)
+    let element = text.plain_text || ""
 
-    // Apply text formatting
     if (text.annotations?.bold) {
-      element = <strong>{element}</strong>
+      element = <strong key={index}>{element}</strong>
     }
     if (text.annotations?.italic) {
-      element = <em>{element}</em>
-    }
-    if (text.annotations?.strikethrough) {
-      element = <del>{element}</del>
-    }
-    if (text.annotations?.underline) {
-      element = <u>{element}</u>
+      element = <em key={index}>{element}</em>
     }
     if (text.annotations?.code) {
       element = (
-        <code className="bg-gray-100 dark:bg-gray-800 text-red-600 dark:text-red-400 px-1.5 py-0.5 rounded text-sm font-mono">
+        <code key={index} className="bg-muted px-1 py-0.5 rounded text-sm font-mono">
           {element}
         </code>
       )
     }
 
-    // Handle links
-    if (text.href) {
-      element = (
-        <a
-          key={index}
-          href={text.href}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-blue-600 dark:text-blue-400 hover:underline"
-        >
-          {element}
-        </a>
-      )
-    }
-
-    // Apply color styling if present
-    if (colorClass && !text.annotations?.code) {
-      return (
-        <span key={index} className={colorClass}>
-          {element}
-        </span>
-      )
-    }
-
-    return <span key={index}>{element}</span>
+    return element
   })
 }

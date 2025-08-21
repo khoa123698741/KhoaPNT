@@ -1,11 +1,14 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { Sun, Moon, Home, User } from "lucide-react"
+import { useState } from "react"
+
+import { useEffect } from "react"
+import Link from "next/link"
+import { Home } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useTheme } from "next-themes"
 import { LogoutButton } from "@/components/logout-button"
-import Link from "next/link"
+import { SunIcon, MoonIcon } from "@/components/icons"
 
 export default function Header() {
   const { theme, setTheme } = useTheme()
@@ -32,46 +35,42 @@ export default function Header() {
     }
   }, [])
 
-  if (!mounted) {
-    return null
-  }
+  if (!mounted) return null
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
-      <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-        <Link href="/" className="text-xl font-semibold text-foreground hover:opacity-80 transition-opacity">
-          ÔN THI NỘI TRÚ PHẠM NGỌC THẠCH 2026
-        </Link>
+    <header className="fixed top-0 left-0 right-0 z-50 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 container flex h-14 items-center">
+        <div className="flex items-center">
+          <Link
+            href="/"
+            className="text-xl font-bold text-foreground hover:text-primary transition-colors mr-6 flex items-center space-x-2"
+          >
+            ÔN THI NỘI TRÚ PHẠM NGỌC THẠCH 2026
+          </Link>
+        </div>
 
-        <div className="flex items-center gap-2">
-          <Button asChild variant="ghost">
-            <Link href="/" className="flex items-center gap-2">
+        {/* Navigation */}
+        <nav className="flex items-center space-x-4">
+          <Link href="/">
+            <Button variant="ghost" size="sm" className="flex items-center space-x-2">
               <Home className="h-4 w-4" />
               Trang chủ
+            </Button>
+          </Link>
+          {isAdmin && (
+            <Link href="/admin">
+              <Button variant="ghost" size="sm" className="flex items-center space-x-2">
+                <Home className="h-4 w-4" />
+                Admin
+              </Button>
             </Link>
-          </Button>
-
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-            className="h-9 w-9"
-          >
-            {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+          )}
+          {isAuthenticated && <LogoutButton />}
+          <Button variant="ghost" size="sm" onClick={() => setTheme(theme === "dark" ? "light" : "dark")}>
+            {theme === "dark" ? <SunIcon className="h-4 w-4" /> : <MoonIcon className="h-4 w-4" />}
             <span className="sr-only">Toggle theme</span>
           </Button>
-
-          {isAdmin && (
-            <Button asChild variant="ghost" size="icon" className="h-9 w-9">
-              <Link href="/admin">
-                <User className="h-4 w-4" />
-                <span className="sr-only">Admin</span>
-              </Link>
-            </Button>
-          )}
-
-          {isAuthenticated && <LogoutButton />}
-        </div>
+        </nav>
       </div>
     </header>
   )

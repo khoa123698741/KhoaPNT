@@ -1,8 +1,9 @@
 "use client"
 
 import { useState } from "react"
-import { ExternalLink, Download } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
+import { FileText, ExternalLink } from "lucide-react"
 
 interface PDFViewerProps {
   url: string
@@ -10,64 +11,32 @@ interface PDFViewerProps {
 }
 
 export function PDFViewer({ url, caption }: PDFViewerProps) {
-  const [isLoading, setIsLoading] = useState(true)
+  const [isLoading, setIsLoading] = useState(false)
 
-  const handleOpenInNewTab = () => {
-    window.open(url, "_blank", "noopener,noreferrer")
-  }
-
-  const handleDownload = () => {
-    const link = document.createElement("a")
-    link.href = url
-    link.download = caption || "document.pdf"
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
+  const handleViewPDF = () => {
+    setIsLoading(true)
+    // Mở PDF trong tab mới
+    window.open(url, "_blank")
+    setIsLoading(false)
   }
 
   return (
-    <div className="w-full my-4">
-      <div className="relative bg-gray-100 dark:bg-gray-800 rounded-lg overflow-hidden">
-        <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 border-b">
-          <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{caption || "PDF Document"}</span>
-          <div className="flex gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleOpenInNewTab}
-              className="flex items-center gap-1 bg-transparent"
-            >
-              <ExternalLink className="h-4 w-4" />
-              Mở trong tab mới
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleDownload}
-              className="flex items-center gap-1 bg-transparent"
-            >
-              <Download className="h-4 w-4" />
-              Tải xuống
-            </Button>
-          </div>
-        </div>
-
-        <div className="relative" style={{ height: "600px" }}>
-          {isLoading && (
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 dark:border-gray-100"></div>
+    <Card className="my-4">
+      <CardContent className="p-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-3">
+            <FileText className="h-8 w-8 text-red-500" />
+            <div>
+              <p className="font-medium">{caption || "PDF Document"}</p>
+              <p className="text-sm text-muted-foreground">Click để xem PDF</p>
             </div>
-          )}
-          <iframe
-            src={`${url}#toolbar=1&navpanes=1&scrollbar=1`}
-            className="w-full h-full border-0"
-            onLoad={() => setIsLoading(false)}
-            title={caption || "PDF Document"}
-          />
+          </div>
+          <Button onClick={handleViewPDF} disabled={isLoading} className="flex items-center space-x-2">
+            <ExternalLink className="h-4 w-4" />
+            <span>{isLoading ? "Đang tải..." : "Xem PDF"}</span>
+          </Button>
         </div>
-      </div>
-
-      {caption && <p className="text-sm text-gray-600 dark:text-gray-400 mt-2 text-center italic">{caption}</p>}
-    </div>
+      </CardContent>
+    </Card>
   )
 }

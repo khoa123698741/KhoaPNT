@@ -1,22 +1,23 @@
-import { renderRichText, getNotionColorClasses } from "@/lib/notion-block-mapper"
+"use client"
+
+import { useState } from "react"
 import { Checkbox } from "@/components/ui/checkbox"
+import { renderRichText, type NotionBlock } from "@/lib/notion-block-mapper"
 
-interface TodoListProps {
-  block: any
-}
-
-export function TodoListBlock({ block }: TodoListProps) {
+export function TodoListBlock({ block }: { block: NotionBlock }) {
   const text = block.to_do?.rich_text || []
-  const checked = block.to_do?.checked || false
-  const color = block.to_do?.color
-  const colorClass = getNotionColorClasses(color)
-
-  if (!text.length) return null
+  const initialChecked = block.to_do?.checked || false
+  const [checked, setChecked] = useState(initialChecked)
 
   return (
-    <div className={`flex items-start gap-2 mb-2 ${colorClass}`}>
-      <Checkbox checked={checked} disabled className="mt-1" />
-      <span className={checked ? "line-through opacity-60" : ""}>{renderRichText(text)}</span>
+    <div className="flex items-center space-x-3">
+      <Checkbox id={`todo-${block.id}`} checked={checked} onCheckedChange={(value) => setChecked(!!value)} />
+      <label
+        htmlFor={`todo-${block.id}`}
+        className={`text-sm cursor-pointer ${checked ? "line-through text-muted-foreground" : "text-foreground"}`}
+      >
+        {renderRichText(text)}
+      </label>
     </div>
   )
 }
